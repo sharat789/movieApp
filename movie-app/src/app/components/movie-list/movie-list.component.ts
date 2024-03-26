@@ -1,30 +1,33 @@
-import { Component, OnInit } from '@angular/core';
-import { Movie } from '../../models/movie.model';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MovieService } from '../../services/movie.service';
+import { Observable, Subject, of, takeUntil } from 'rxjs';
+import { MovieListObject } from '../../types';
+import { RouterLink } from '@angular/router';
+import { SearchService } from '../../services/search.service';
 
 @Component({
   selector: 'app-movie-list',
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './movie-list.component.html',
   standalone: true,
-  styleUrls: ['./movie-list.component.scss']
+  styleUrls: ['./movie-list.component.scss', '../../app.component.scss']  
 })
-export class MovieListComponent implements OnInit {
-  movies: Movie[] = [];
-
-  constructor(private movieService : MovieService) { }
-
-  ngOnInit(): void {
-    this.fetchMovies();
-  }
-
-  fetchMovies(): void {
-    this.movieService.getMovies().subscribe(movies => {
-      this.movies = movies;
+export class MovieListComponent  {
+  movies$: Observable<MovieListObject[]> = of([]);
+  private destroy$ = new Subject<void>();
+  constructor(private movieService : MovieService, private searchService: SearchService) {
+    this.searchService.searchObservable.pipe(takeUntil(this.destroy$)).subscribe(term => {
+      if (term) {
+        this.movies$ = this.movieService.searchMovies(term);
+      } else {
+        this.movies$ = this.movieService.getMovies();
+      }
     });
   }
-
+  
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }
