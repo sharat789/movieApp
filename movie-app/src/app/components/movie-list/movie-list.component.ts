@@ -1,30 +1,21 @@
-import { Component, OnInit } from '@angular/core';
-import { Movie } from '../../models/movie.model';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MovieService } from '../../services/movie.service';
+import { Observable, of } from 'rxjs';
+import { MovieListObject } from '../../types';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-movie-list',
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './movie-list.component.html',
   standalone: true,
-  styleUrls: ['./movie-list.component.scss']
+  styleUrls: ['./movie-list.component.scss', '../../app.component.scss']
 })
-export class MovieListComponent implements OnInit {
-  movies: Movie[] = [];
+export class MovieListComponent  {
+  movies$: Observable<MovieListObject[]> = of([]);
 
-  constructor(private movieService : MovieService) { }
-
-  ngOnInit(): void {
-    this.fetchMovies();
+  constructor(private movieService : MovieService) {
+    this.movies$ = this.movieService.getMovies();
   }
-
-  fetchMovies(): void {
-    this.movieService.getMovies().subscribe(movies => {
-      this.movies = movies;
-    });
-  }
-
 }
