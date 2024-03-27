@@ -34,4 +34,16 @@ export class MovieService {
       }
     );
   }
+  searchMovies(term: string): Observable<MovieListObject[]> {
+    return this.httpClient.get<MovieSearchResponse>(
+      `https://api.themoviedb.org/3/search/movie`,
+      {
+        params: {
+          api_key: this.api_key,
+          query: term
+        },
+      }
+    ).pipe(map((response) => response.results));
+  }
+  
 }
