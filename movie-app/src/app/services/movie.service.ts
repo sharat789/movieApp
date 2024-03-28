@@ -11,15 +11,14 @@ export class MovieService {
 
   private readonly api_key = 'bc3cbb180a0ca2a35eb2d9c278f6d3b3';
 
+  requiredParameters = {
+    api_key: this.api_key,
+  };
+
   getMovies(): Observable<MovieListObject[]> {
-    const requiredParameters = {
-      api_key: this.api_key,
-    };
-
-
     return this.httpClient
       .get<MovieSearchResponse>(`https://api.themoviedb.org/3/movie/popular?language=en-US&page=1`, {
-        params: requiredParameters,
+        params: this.requiredParameters,
       })
       .pipe(map((response) => response.results));
   }
@@ -28,9 +27,7 @@ export class MovieService {
     return this.httpClient.get<MovieListObject>(
       `https://api.themoviedb.org/3/movie/${id}`,
       {
-        params: {
-          api_key: this.api_key,
-        },
+        params: this.requiredParameters,
       }
     );
   }
@@ -38,10 +35,7 @@ export class MovieService {
     return this.httpClient.get<MovieSearchResponse>(
       `https://api.themoviedb.org/3/search/movie`,
       {
-        params: {
-          api_key: this.api_key,
-          query: term
-        },
+        params: this.requiredParameters,
       }
     ).pipe(map((response) => response.results));
   }
