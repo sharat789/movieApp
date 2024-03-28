@@ -8,10 +8,9 @@ describe('MovieDetailsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [MovieDetailsComponent]
-    })
-    .compileComponents();
-    
+      imports: [MovieDetailsComponent],
+    }).compileComponents();
+
     fixture = TestBed.createComponent(MovieDetailsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

@@ -1,10 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { MovieListComponent } from './components/movie-list/movie-list.component';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { SearchService } from './services/search.service';
-import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
-
+import {  debounceTime, distinctUntilChanged } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -14,14 +14,14 @@ import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 })
 export class AppComponent {
   searchForm: FormGroup;
-  private destroy$ = new Subject<void>();
+  #destroyRef = inject(DestroyRef);
 
   constructor(private formBuilder: FormBuilder, private searchService: SearchService, private router: Router) {
     this.searchForm =  this.formBuilder.group({
       search: ['']
     });
     this.searchForm.get('search')?.valueChanges.pipe(
-      takeUntil(this.destroy$),
+      takeUntilDestroyed(this.#destroyRef),
       debounceTime(1000),
       distinctUntilChanged()
     ).subscribe(term => {
@@ -38,8 +38,4 @@ export class AppComponent {
     this.router.navigate(['/login']);
     }
 
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
   }

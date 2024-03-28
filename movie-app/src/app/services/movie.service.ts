@@ -45,5 +45,5 @@ export class MovieService {
       }
     ).pipe(map((response) => response.results));
   }
-  
+
 }
